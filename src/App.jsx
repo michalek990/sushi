@@ -1,5 +1,76 @@
 import { useState, useEffect, useRef } from "react";
 
+const fullMenuData = [
+  {
+    category: "ZESTAWY",
+    icon: "🍱",
+    items: [
+      { name: "Talerz Mały", desc: "ok. 16 szt. — tosty, quesadille, krakersy, bagietki", price: "150 zł", emoji: "🥢" },
+      { name: "Talerz Duży", desc: "ok. 28 szt. — pełny przekrój wszystkich przekąsek", price: "250 zł", emoji: "🍽️" },
+      { name: "Talerz Sushi", desc: "ok. 20 szt. — maki, nigiri, uramaki", price: "180 zł", emoji: "🍣" },
+      { name: "Talerz Mix", desc: "ok. 24 szt. — sushi + przekąski fusion", price: "210 zł", emoji: "🎌" },
+    ],
+  },
+  {
+    category: "ROLKI SUSHI",
+    icon: "🍣",
+    items: [
+      { name: "Maki Łosoś", desc: "6 szt. — ryż, nori, świeży łosoś", price: "28 zł", emoji: "🐟" },
+      { name: "Maki Tuńczyk", desc: "6 szt. — ryż, nori, tuńczyk bluefin", price: "32 zł", emoji: "🔴" },
+      { name: "Uramaki Avocado", desc: "8 szt. — ryż na zewnątrz, awokado, ogórek", price: "34 zł", emoji: "🥑" },
+      { name: "Uramaki Krewetka", desc: "8 szt. — krewetka tempura, majonez wasabi", price: "38 zł", emoji: "🦐" },
+      { name: "Dragon Roll", desc: "8 szt. — węgorz, awokado, ogórek, sos eel", price: "44 zł", emoji: "🐉" },
+      { name: "Rainbow Roll", desc: "8 szt. — 5 rodzajów ryb na wierzchu", price: "52 zł", emoji: "🌈" },
+    ],
+  },
+  {
+    category: "PRZEKĄSKI",
+    icon: "🥗",
+    items: [
+      { name: "Tosty z szynką", desc: "3 szt. — chleb japoński, szynka, sos miso", price: "22 zł", emoji: "🍞" },
+      { name: "Quesadilla z kurczakiem", desc: "2 szt. — kurczak teriyaki, warzywa, ser", price: "26 zł", emoji: "🌮" },
+      { name: "Krakersy z tatarem", desc: "4 szt. — tatar z łososia, kapary, koper", price: "30 zł", emoji: "🫙" },
+      { name: "Bagietki z krewetką", desc: "2 szt. — krewetka, guacamole, limonka", price: "28 zł", emoji: "🥖" },
+      { name: "Chipsy z batata", desc: "Porcja — z sosem sriracha mayo", price: "18 zł", emoji: "🍠" },
+      { name: "Cukinia z serkiem", desc: "2 szt. — salsa paprykowa, zioła", price: "20 zł", emoji: "🥒" },
+    ],
+  },
+  {
+    category: "DESERY",
+    icon: "🍮",
+    items: [
+      { name: "Mochi Truskawka", desc: "3 szt. — ryżowe kulki z nadzieniem", price: "22 zł", emoji: "🍓" },
+      { name: "Mochi Matcha", desc: "3 szt. — herbata matcha, kremowe wnętrze", price: "22 zł", emoji: "🍵" },
+      { name: "Dorayaki", desc: "2 szt. — japońskie naleśniki z pastą anko", price: "18 zł", emoji: "🥞" },
+      { name: "Taiyaki", desc: "1 szt. — wafle w kształcie ryby, krem waniliowy", price: "16 zł", emoji: "🐠" },
+      { name: "Lody Sezam", desc: "Gałka — czarny sezam, posypka mochi", price: "14 zł", emoji: "🍨" },
+    ],
+  },
+  {
+    category: "NAPOJE",
+    icon: "🍵",
+    items: [
+      { name: "Matcha Latte", desc: "Klasyczne lub na mleku owsianym", price: "16 zł", emoji: "🍵" },
+      { name: "Ramune Melon", desc: "Japońska lemoniada z kulką", price: "12 zł", emoji: "🫧" },
+      { name: "Woda Gazowana", desc: "Butelka 500ml", price: "8 zł", emoji: "💧" },
+      { name: "Sok Yuzu", desc: "Świeżo wyciskany, lód, mięta", price: "14 zł", emoji: "🍋" },
+      { name: "Herbata Sencha", desc: "Czajniczek 400ml, japońska zielona", price: "12 zł", emoji: "🫖" },
+    ],
+  },
+  {
+    category: "DRINKI",
+    icon: "🍹",
+    items: [
+      { name: "Sakura Spritz", desc: "Sake, woda różana, grapefruit, tonic", price: "32 zł", emoji: "🌸" },
+      { name: "Yuzu Mule", desc: "Wódka, yuzu, imbir, limonka", price: "34 zł", emoji: "🍸" },
+      { name: "Matcha Sour", desc: "Gin, matcha, sok z cytryny, aquafaba", price: "36 zł", emoji: "🟢" },
+      { name: "Tokyo Sunset", desc: "Whisky japońska, sake, pomarańcza", price: "38 zł", emoji: "🌅" },
+      { name: "Sake Tradycyjne", desc: "50ml — zimne lub podgrzewane", price: "22 zł", emoji: "🍶" },
+      { name: "Piwo Sapporo", desc: "330ml — japońskie premium", price: "18 zł", emoji: "🍺" },
+    ],
+  },
+];
+
 const menuData = [
   {
     category: "TALERZ MAŁY", subtitle: "ok. 16 szt.", price: "150 zł", emoji: "🥢",
@@ -38,8 +109,572 @@ const FadeIn = ({ children, delay = 0, className = "" }) => {
   );
 };
 
-// MenuCard accepts lightMode to style itself correctly
-const MenuCard = ({ item, index, lightMode }) => {
+// ─── Shared card content ───────────────────────────────────────────────────
+const CardContent = ({ item, lm }) => (
+  <div style={{ width: "100%", padding: "3rem", position: "relative", boxSizing: "border-box" }}>
+    <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "3px", background: "linear-gradient(90deg, transparent, #d4af59, transparent)" }} />
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", marginBottom: "2rem" }}>
+      <div style={{ fontSize: "6rem", lineHeight: 1, marginBottom: "1.5rem", filter: "drop-shadow(0 0 28px rgba(212,175,89,0.5))" }}>{item.emoji}</div>
+      <div style={{ fontSize: "0.6rem", letterSpacing: "0.35em", color: lm ? "#6b3200" : "#d4af59", marginBottom: "0.5rem", fontFamily: "'Cinzel', serif" }}>{item.subtitle}</div>
+      <h3 style={{ fontFamily: "'Cinzel', serif", fontSize: "clamp(1.4rem, 4vw, 2.2rem)", color: lm ? "#1a0800" : "#f5e6c8", margin: "0 0 0.6rem", letterSpacing: "0.1em" }}>{item.category}</h3>
+      <div style={{ fontFamily: "'Cinzel', serif", fontSize: "2.2rem", color: lm ? "#6b3200" : "#d4af59", fontWeight: "700" }}>{item.price}</div>
+    </div>
+    <div style={{ width: "80px", height: "1px", background: `linear-gradient(90deg, transparent, ${lm ? "#8b4200" : "#d4af59"}, transparent)`, margin: "0 auto 2rem" }} />
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem 2rem" }}>
+      {item.items.map((it, idx) => (
+        <div key={idx} style={{ display: "flex", alignItems: "baseline", gap: "0.6rem", color: lm ? "#2a1000" : "rgba(245,230,200,0.8)", fontFamily: "'Cormorant Garamond', serif", fontSize: "1rem", lineHeight: 1.6 }}>
+          <span style={{ color: lm ? "#8b4200" : "#d4af59", fontSize: "0.4rem", flexShrink: 0 }}>◆</span>
+          {it}
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+// ─── Shared nav dots ────────────────────────────────────────────────────────
+const ArcNav = ({ current, total, goTo, lm, onPrev, onNext }) => (
+  <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "2rem", marginTop: "2.5rem" }}>
+    <button className="c-arrow" onClick={onPrev} aria-label="Poprzedni">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke={lm ? "#6b3200" : "#d4af59"} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+    </button>
+    <div style={{ position: "relative", width: "130px", height: "60px" }}>
+      <svg width="130" height="60" viewBox="0 0 130 60" style={{ position: "absolute", inset: 0 }}>
+        <path d="M 10 56 Q 65 -8 120 56" fill="none" stroke={lm ? "rgba(60,20,0,0.2)" : "rgba(212,175,89,0.2)"} strokeWidth="1.5" strokeDasharray="4 4"/>
+      </svg>
+      {Array.from({ length: total }).map((_, i) => {
+        const angle = (Math.PI / (total - 1)) * i;
+        const cx = 10 + (120 - 10) * (i / (total - 1));
+        const cy = 56 - Math.sin(angle) * 48;
+        const isActive = i === current;
+        return (
+          <button key={i} className="c-dot" onClick={() => goTo(i, i > current ? 1 : -1)}
+            style={{ position: "absolute", left: `${cx - (isActive ? 11 : 7)}px`, top: `${cy - (isActive ? 11 : 7)}px`, width: isActive ? "22px" : "14px", height: isActive ? "22px" : "14px", background: isActive ? "linear-gradient(135deg, #ffe066, #d4af59)" : (lm ? "rgba(60,20,0,0.3)" : "rgba(212,175,89,0.3)"), boxShadow: isActive ? "0 0 0 3px rgba(212,175,89,0.2), 0 0 18px rgba(212,175,89,0.5)" : "none", border: "none", cursor: "pointer", borderRadius: "50%", padding: 0, transition: "all 0.3s cubic-bezier(0.34,1.56,0.64,1)" }}
+            aria-label={menuData[i].category}
+          />
+        );
+      })}
+    </div>
+    <button className="c-arrow" onClick={onNext} aria-label="Następny">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke={lm ? "#6b3200" : "#d4af59"} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+    </button>
+  </div>
+);
+
+const carouselSharedCSS = `
+  .c-arrow { background: transparent; border: 1px solid rgba(212,175,89,0.35); cursor: pointer; border-radius: 50%; width:48px; height:48px; display:flex; align-items:center; justify-content:center; transition: all 0.3s; flex-shrink:0; }
+  .c-arrow:hover { border-color: #d4af59; background: rgba(212,175,89,0.1); transform: scale(1.08); }
+  .c-arrow:active { transform: scale(0.95); }
+  .c-dot:hover { transform: scale(1.3) !important; }
+  .c-counter { text-align:center; margin-top:1rem; font-family:'Cinzel',serif; font-size:0.6rem; letter-spacing:0.3em; }
+`;
+
+const cardBaseStyle = (lm) => ({
+  position: "absolute", inset: 0,
+  background: lm ? "rgba(40,15,0,0.14)" : "rgba(255,255,255,0.05)",
+  border: lm ? "1px solid rgba(60,20,0,0.38)" : "1px solid rgba(212,175,89,0.22)",
+  borderRadius: "4px",
+  overflow: "hidden",
+  willChange: "transform, opacity",
+});
+
+// ═══════════════════════════════════════════════════════════════
+// WERSJA A — Flip 3D (obrót jak fizyczna kartka)
+// ═══════════════════════════════════════════════════════════════
+const MenuCarouselFlip = ({ lightMode }) => {
+  const [current, setCurrent] = useState(0);
+  const [flipping, setFlipping] = useState(false);
+  const [dir, setDir] = useState(1);
+  const total = menuData.length;
+  const lm = lightMode;
+
+  const goTo = (idx, d) => {
+    if (flipping || idx === current) return;
+    setDir(d);
+    setFlipping(true);
+    setTimeout(() => { setCurrent(idx); setFlipping(false); }, 600);
+  };
+
+  return (
+    <div style={{ position: "relative", maxWidth: "680px", margin: "0 auto" }}>
+      <style>{`
+        ${carouselSharedCSS}
+        @keyframes flipOut { 0%{transform:perspective(900px) rotateY(0deg);opacity:1} 100%{transform:perspective(900px) rotateY(${dir > 0 ? "-90deg" : "90deg"});opacity:0.2} }
+        @keyframes flipIn  { 0%{transform:perspective(900px) rotateY(${dir > 0 ? "90deg" : "-90deg"});opacity:0.2} 100%{transform:perspective(900px) rotateY(0deg);opacity:1} }
+        .flip-out { animation: flipOut 0.3s cubic-bezier(0.55,0,1,0.45) forwards; }
+        .flip-in  { animation: flipIn  0.35s cubic-bezier(0,0.55,0.45,1) 0.3s both; }
+      `}</style>
+      <div style={{ position: "relative", minHeight: "460px", perspective: "900px" }}>
+        <div key={`${current}-${flipping}`} className={flipping ? "flip-out" : "flip-in"} style={{ ...cardBaseStyle(lm) }}>
+          <CardContent item={menuData[current]} lm={lm} />
+        </div>
+      </div>
+      <ArcNav current={current} total={total} goTo={goTo} lm={lm}
+        onPrev={() => goTo((current - 1 + total) % total, -1)}
+        onNext={() => goTo((current + 1) % total, 1)} />
+      <div className="c-counter" style={{ color: lm ? "rgba(60,20,0,0.4)" : "rgba(212,175,89,0.4)" }}>{current + 1} / {total}</div>
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════
+// WERSJA B — Curtain (złota zasłona przesuwa się i odkrywa)
+// ═══════════════════════════════════════════════════════════════
+const MenuCarouselCurtain = ({ lightMode }) => {
+  const [current, setCurrent] = useState(0);
+  const [next, setNext] = useState(null);
+  const [phase, setPhase] = useState("idle"); // idle | closing | opening
+  const [dir, setDir] = useState(1);
+  const total = menuData.length;
+  const lm = lightMode;
+
+  const goTo = (idx, d) => {
+    if (phase !== "idle" || idx === current) return;
+    setDir(d);
+    setNext(idx);
+    setPhase("closing");
+    setTimeout(() => {
+      setCurrent(idx);
+      setNext(null);
+      setPhase("opening");
+      setTimeout(() => setPhase("idle"), 450);
+    }, 380);
+  };
+
+  // Curtain position: covers full width when closing, reveals when opening
+  const curtainX = phase === "closing"
+    ? (dir > 0 ? "0%" : "0%")
+    : phase === "opening" ? (dir > 0 ? "100%" : "-100%") : (dir > 0 ? "-100%" : "100%");
+
+  const curtainTransition = phase === "closing"
+    ? "transform 0.38s cubic-bezier(0.76,0,0.24,1)"
+    : phase === "opening"
+    ? "transform 0.45s cubic-bezier(0.16,1,0.3,1)"
+    : "none";
+
+  const curtainStart = phase === "closing"
+    ? (dir > 0 ? "-100%" : "100%")
+    : undefined;
+
+  return (
+    <div style={{ position: "relative", maxWidth: "680px", margin: "0 auto" }}>
+      <style>{`${carouselSharedCSS}`}</style>
+      <div style={{ position: "relative", minHeight: "460px", overflow: "hidden", borderRadius: "4px" }}>
+        {/* Static card underneath */}
+        <div style={{ ...cardBaseStyle(lm) }}>
+          <CardContent item={menuData[current]} lm={lm} />
+        </div>
+        {/* Gold curtain overlay */}
+        <div style={{
+          position: "absolute", inset: 0, zIndex: 10,
+          background: `linear-gradient(135deg, #1a1002, #2a1e05, #d4af59 50%, #2a1e05, #1a1002)`,
+          transform: phase === "idle"
+            ? (dir > 0 ? "translateX(-100%)" : "translateX(100%)")
+            : phase === "closing"
+            ? "translateX(0%)"
+            : (dir > 0 ? "translateX(100%)" : "translateX(-100%)"),
+          transition: phase === "idle" ? "none" : `transform ${phase === "closing" ? "0.38s" : "0.45s"} cubic-bezier(${phase === "closing" ? "0.76,0,0.24,1" : "0.16,1,0.3,1"})`,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          pointerEvents: "none",
+        }}>
+          <div style={{ fontFamily: "'Cinzel', serif", fontSize: "1.5rem", letterSpacing: "0.4em", color: "rgba(255,230,150,0.6)", textShadow: "0 0 30px rgba(212,175,89,0.8)" }}>✦</div>
+        </div>
+      </div>
+      <ArcNav current={current} total={total} goTo={goTo} lm={lm}
+        onPrev={() => goTo((current - 1 + total) % total, -1)}
+        onNext={() => goTo((current + 1) % total, 1)} />
+      <div className="c-counter" style={{ color: lm ? "rgba(60,20,0,0.4)" : "rgba(212,175,89,0.4)" }}>{current + 1} / {total}</div>
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════
+// WERSJA C — Zoom blur (stara odpływa w dal, nowa przylatuje)
+// ═══════════════════════════════════════════════════════════════
+const MenuCarouselZoom = ({ lightMode }) => {
+  const [current, setCurrent] = useState(0);
+  const [prev, setPrev] = useState(null);
+  const [phase, setPhase] = useState("idle");
+  const [dir, setDir] = useState(1);
+  const total = menuData.length;
+  const lm = lightMode;
+
+  const goTo = (idx, d) => {
+    if (phase !== "idle" || idx === current) return;
+    setDir(d);
+    setPrev(current);
+    setPhase("out");
+    setTimeout(() => {
+      setCurrent(idx);
+      setPhase("in");
+      setTimeout(() => { setPrev(null); setPhase("idle"); }, 500);
+    }, 280);
+  };
+
+  return (
+    <div style={{ position: "relative", maxWidth: "680px", margin: "0 auto" }}>
+      <style>{`
+        ${carouselSharedCSS}
+        @keyframes zoomFadeOut { 0%{transform:scale(1);opacity:1;filter:blur(0px)} 100%{transform:scale(1.18);opacity:0;filter:blur(8px)} }
+        @keyframes zoomFadeIn  { 0%{transform:scale(0.82);opacity:0;filter:blur(8px)} 100%{transform:scale(1);opacity:1;filter:blur(0px)} }
+        .zoom-out { animation: zoomFadeOut 0.28s cubic-bezier(0.55,0,1,0.45) forwards; }
+        .zoom-in  { animation: zoomFadeIn  0.5s cubic-bezier(0.16,1,0.3,1) both; }
+      `}</style>
+      <div style={{ position: "relative", minHeight: "460px", overflow: "hidden", borderRadius: "4px" }}>
+        {prev !== null && (
+          <div className="zoom-out" style={{ ...cardBaseStyle(lm) }}>
+            <CardContent item={menuData[prev]} lm={lm} />
+          </div>
+        )}
+        <div key={current} className={phase === "in" || phase === "idle" ? "zoom-in" : ""} style={{ ...cardBaseStyle(lm), animationPlayState: phase === "idle" && prev === null ? "paused" : "running" }}>
+          <CardContent item={menuData[current]} lm={lm} />
+        </div>
+      </div>
+      <ArcNav current={current} total={total} goTo={goTo} lm={lm}
+        onPrev={() => goTo((current - 1 + total) % total, -1)}
+        onNext={() => goTo((current + 1) % total, 1)} />
+      <div className="c-counter" style={{ color: lm ? "rgba(60,20,0,0.4)" : "rgba(212,175,89,0.4)" }}>{current + 1} / {total}</div>
+    </div>
+  );
+};
+
+const MenuCarousel = ({ lightMode, t }) => {
+  // LEGACY — not used, kept for reference
+  const [current, setCurrent] = useState(0);
+  const [prev, setPrev] = useState(null);
+  const [dir, setDir] = useState(1);
+  const [phase, setPhase] = useState("idle");
+  const total = menuData.length;
+  const lm = lightMode;
+
+  const goTo = (idx, d) => {
+    if (phase !== "idle" || idx === current) return;
+    setDir(d);
+    setPrev(current);
+    setPhase("out");
+    // After exit anim, swap and play enter
+    setTimeout(() => {
+      setCurrent(idx);
+      setPhase("in");
+      setTimeout(() => {
+        setPrev(null);
+        setPhase("idle");
+      }, 550);
+    }, 350);
+  };
+
+  const next = () => goTo((current + 1) % total, 1);
+  const goBack = () => goTo((current - 1 + total) % total, -1);
+
+  // CSS for outgoing card
+  const outStyle = phase === "out" ? {
+    transform: dir > 0 ? "translateX(-100%) scale(0.85)" : "translateX(100%) scale(0.85)",
+    opacity: 0,
+    transition: "transform 0.35s cubic-bezier(0.55,0,1,0.45), opacity 0.35s ease",
+  } : {};
+
+  // CSS for incoming card — starts off-screen then slides in
+  const inStyle = phase === "in" ? {
+    transform: "translateX(0) scale(1)",
+    opacity: 1,
+    transition: "transform 0.55s cubic-bezier(0.16,1,0.3,1), opacity 0.45s ease",
+  } : phase === "out" ? {
+    // pre-position the incoming card off screen (no transition yet)
+    transform: dir > 0 ? "translateX(100%) scale(0.9)" : "translateX(-100%) scale(0.9)",
+    opacity: 0,
+    transition: "none",
+  } : {};
+
+  const cardBase = {
+    position: "absolute", inset: 0,
+    background: lm ? "rgba(40,15,0,0.14)" : "rgba(255,255,255,0.05)",
+    border: lm ? "1px solid rgba(60,20,0,0.38)" : "1px solid rgba(212,175,89,0.22)",
+    borderRadius: "4px",
+    willChange: "transform, opacity",
+  };
+
+  return (
+    <div style={{ position: "relative", maxWidth: "680px", margin: "0 auto" }}>
+      <style>{`
+        .arrow-btn { background: transparent; border: 1px solid rgba(212,175,89,0.35); cursor: pointer; border-radius: 50%; width:48px; height:48px; display:flex; align-items:center; justify-content:center; transition: all 0.3s; flex-shrink:0; }
+        .arrow-btn:hover { border-color: #d4af59; background: rgba(212,175,89,0.1); transform: scale(1.08); }
+        .arrow-btn:active { transform: scale(0.95); }
+        .dot-btn { border: none; cursor: pointer; border-radius: 50%; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), background 0.3s, box-shadow 0.3s, width 0.3s, height 0.3s; padding:0; }
+        .dot-btn:hover { transform: scale(1.3) !important; }
+        @keyframes emojiPop { 0%{transform:scale(0.5) rotate(-15deg);opacity:0} 60%{transform:scale(1.15) rotate(5deg);opacity:1} 100%{transform:scale(1) rotate(0deg);opacity:1} }
+        .emoji-pop { animation: emojiPop 0.55s cubic-bezier(0.16,1,0.3,1) both; }
+        @keyframes goldGlow { 0%,100%{filter:drop-shadow(0 0 12px rgba(212,175,89,0.3))} 50%{filter:drop-shadow(0 0 30px rgba(212,175,89,0.7))} }
+        .emoji-glow { animation: goldGlow 2.5s ease-in-out infinite; }
+      `}</style>
+
+      {/* TRACK */}
+      <div style={{ position: "relative", minHeight: "460px", overflow: "hidden", borderRadius: "4px" }}>
+
+        {/* Outgoing card (prev) */}
+        {prev !== null && (
+          <div style={{ ...cardBase, ...outStyle }}>
+            <CarouselSlide item={menuData[prev]} lm={lm} />
+          </div>
+        )}
+
+        {/* Current card */}
+        <div style={{ ...cardBase, ...(phase === "idle" ? {} : inStyle) }}>
+          <div style={{ width: "100%", padding: "3rem", position: "relative", overflow: "hidden", boxSizing: "border-box" }}>
+            <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "3px", background: "linear-gradient(90deg, transparent, #d4af59, transparent)" }} />
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", marginBottom: "2rem" }}>
+              <div key={current} className={phase === "in" ? "emoji-pop emoji-glow" : "emoji-glow"} style={{ fontSize: "6rem", lineHeight: 1, marginBottom: "1.5rem" }}>
+                {menuData[current].emoji}
+              </div>
+              <div style={{ fontSize: "0.6rem", letterSpacing: "0.35em", color: lm ? "#6b3200" : "#d4af59", marginBottom: "0.5rem", fontFamily: "'Cinzel', serif" }}>
+                {menuData[current].subtitle}
+              </div>
+              <h3 style={{ fontFamily: "'Cinzel', serif", fontSize: "clamp(1.4rem, 4vw, 2.2rem)", color: lm ? "#1a0800" : "#f5e6c8", margin: "0 0 0.6rem", letterSpacing: "0.1em" }}>
+                {menuData[current].category}
+              </h3>
+              <div style={{ fontFamily: "'Cinzel', serif", fontSize: "2.2rem", color: lm ? "#6b3200" : "#d4af59", fontWeight: "700", letterSpacing: "0.05em" }}>
+                {menuData[current].price}
+              </div>
+            </div>
+            <div style={{ width: "80px", height: "1px", background: `linear-gradient(90deg, transparent, ${lm ? "#8b4200" : "#d4af59"}, transparent)`, margin: "0 auto 2rem" }} />
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem 2rem" }}>
+              {menuData[current].items.map((it, idx) => (
+                <div key={idx} style={{ display: "flex", alignItems: "baseline", gap: "0.6rem", color: lm ? "#2a1000" : "rgba(245,230,200,0.8)", fontFamily: "'Cormorant Garamond', serif", fontSize: "1rem", lineHeight: 1.6 }}>
+                  <span style={{ color: lm ? "#8b4200" : "#d4af59", fontSize: "0.4rem", flexShrink: 0 }}>◆</span>
+                  {it}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* NAVIGATION */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "2rem", marginTop: "2.5rem" }}>
+
+        {/* Prev arrow */}
+        <button className="arrow-btn" onClick={goBack} aria-label="Poprzedni">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+            <path d="M10 3L5 8l5 5" stroke={lm ? "#6b3200" : "#d4af59"} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
+
+        {/* Arc dots */}
+        <div style={{ position: "relative", width: "130px", height: "60px" }}>
+          <svg width="130" height="60" viewBox="0 0 130 60" style={{ position: "absolute", inset: 0 }}>
+            <path d="M 10 56 Q 65 -8 120 56" fill="none"
+              stroke={lm ? "rgba(60,20,0,0.2)" : "rgba(212,175,89,0.2)"}
+              strokeWidth="1.5" strokeDasharray="4 4"/>
+          </svg>
+          {menuData.map((_, i) => {
+            const angle = (Math.PI / (total - 1)) * i;
+            const cx = 10 + (120 - 10) * (i / (total - 1));
+            const cy = 56 - Math.sin(angle) * 48;
+            const isActive = i === current;
+            return (
+              <button key={i} className="dot-btn"
+                onClick={() => goTo(i, i > current ? 1 : -1)}
+                style={{
+                  position: "absolute",
+                  left: `${cx - (isActive ? 11 : 7)}px`,
+                  top: `${cy - (isActive ? 11 : 7)}px`,
+                  width: isActive ? "22px" : "14px",
+                  height: isActive ? "22px" : "14px",
+                  background: isActive
+                    ? "linear-gradient(135deg, #ffe066, #d4af59)"
+                    : (lm ? "rgba(60,20,0,0.3)" : "rgba(212,175,89,0.3)"),
+                  boxShadow: isActive
+                    ? "0 0 0 3px rgba(212,175,89,0.2), 0 0 18px rgba(212,175,89,0.5)"
+                    : "none",
+                }}
+                aria-label={menuData[i].category}
+              />
+            );
+          })}
+        </div>
+
+        {/* Next arrow */}
+        <button className="arrow-btn" onClick={next} aria-label="Następny">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+            <path d="M6 3l5 5-5 5" stroke={lm ? "#6b3200" : "#d4af59"} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
+      </div>
+
+      {/* Counter */}
+      <div style={{ textAlign: "center", marginTop: "1rem", fontFamily: "'Cinzel', serif", fontSize: "0.6rem", letterSpacing: "0.3em", color: lm ? "rgba(60,20,0,0.4)" : "rgba(212,175,89,0.4)" }}>
+        {current + 1} / {total}
+      </div>
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════
+// PEŁNA STRONA MENU
+// ═══════════════════════════════════════════════════════════════
+const MenuPage = ({ lightMode, t, onBack }) => {
+  const [activeTab, setActiveTab] = useState(0);
+  const [entering, setEntering] = useState(false);
+
+  const switchTab = (i) => {
+    if (i === activeTab) return;
+    setEntering(true);
+    setTimeout(() => { setActiveTab(i); setEntering(false); }, 220);
+  };
+
+  const lm = lightMode;
+  const cat = fullMenuData[activeTab];
+
+  return (
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 500,
+      background: lm ? "#c8923a" : "#0d0b07",
+      overflowY: "auto",
+      transition: "background 0.4s",
+    }}>
+      <style>{`
+        @keyframes menuPageIn { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes itemsIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+        .mp-tab { cursor:pointer; transition: all 0.25s; border:none; background:transparent; }
+        .mp-item { transition: transform 0.25s, box-shadow 0.25s; }
+        .mp-item:hover { transform:translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
+        .mp-back-label { display: inline; }
+        @media (max-width: 600px) {
+          .mp-back-label { display: none !important; }
+          .mp-back-btn { padding: 0.45rem 0.6rem !important; }
+          .mp-logo { font-size: 0.7rem !important; letter-spacing: 0.12em !important; }
+          .mp-topbar { padding: 0.6rem 0.9rem !important; }
+          .mp-heading { padding: 1.2rem 1rem 0.8rem !important; }
+          .mp-heading h1 { font-size: 1.8rem !important; }
+          .mp-tabs-outer { padding: 0 0.8rem !important; }
+          .mp-tabs-inner { display: grid !important; grid-template-columns: repeat(3,1fr) !important; min-width: unset !important; gap: 0.4rem !important; }
+          .mp-tab { padding: 0.5rem 0.3rem !important; font-size: 0.48rem !important; letter-spacing: 0.05em !important; flex-direction: column; align-items: center; display: flex; gap: 0.15rem; }
+          .mp-cards-grid { grid-template-columns: 1fr !important; }
+          .mp-card-emoji { padding: 1.2rem !important; font-size: 2.8rem !important; }
+          .mp-items-wrap { padding: 1rem 0.9rem 4rem !important; }
+          .mp-cat-header { margin-bottom: 1.2rem !important; }
+        }
+      `}</style>
+
+      {/* Top bar */}
+      <div className="mp-topbar" style={{
+        position: "sticky", top: 0, zIndex: 10,
+        background: lm ? "rgba(120,65,5,0.97)" : "rgba(13,11,7,0.95)",
+        backdropFilter: "blur(20px)",
+        borderBottom: `1px solid ${t.border}`,
+        padding: "1rem 2rem",
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+      }}>
+        <button className="mp-back-btn" onClick={onBack} style={{
+          display: "flex", alignItems: "center", gap: "0.5rem",
+          background: "transparent", border: `1px solid ${t.border}`,
+          color: lm ? "#fff8ee" : "#d4af59",
+          fontFamily: "'Cinzel', serif", fontSize: "0.65rem", letterSpacing: "0.2em",
+          padding: "0.55rem 1.2rem", cursor: "pointer", transition: "all 0.3s",
+          borderRadius: "2px", flexShrink: 0,
+        }}
+          onMouseEnter={e => { e.currentTarget.style.background = "rgba(212,175,89,0.1)"; e.currentTarget.style.borderColor = "#d4af59"; }}
+          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.borderColor = t.border; }}
+        >
+          <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          <span className="mp-back-label">POWRÓT</span>
+        </button>
+        <div className="mp-logo" style={{ fontFamily: "'Cinzel', serif", fontSize: "0.9rem", letterSpacing: "0.3em", color: lm ? "#fff8ee" : "#d4af59", fontWeight: 600 }}>
+          SUSHI <span style={{ color: "#d4af59" }}>✦</span> SZCZYGIEŁ
+        </div>
+        <div style={{ width: "44px", flexShrink: 0 }} />
+      </div>
+
+      {/* Page heading */}
+      <div className="mp-heading" style={{ textAlign: "center", padding: "3rem 2rem 2rem", animation: "menuPageIn 0.6s ease both" }}>
+        <div style={{ fontSize: "0.6rem", letterSpacing: "0.35em", color: t.sectionSubColor, marginBottom: "0.8rem", fontFamily: "'Cinzel', serif" }}>✦ KARTA DAŃ</div>
+        <h1 style={{ fontFamily: "'Cinzel', serif", fontSize: "clamp(2rem, 6vw, 3.5rem)", color: t.sectionHeadingColor, letterSpacing: "0.08em", margin: 0 }}>Nasze Menu</h1>
+        <div style={{ width: "60px", height: "1px", background: `linear-gradient(90deg,transparent,#d4af59,transparent)`, margin: "1.2rem auto 0" }} />
+      </div>
+
+      {/* Category tabs */}
+      <div className="mp-tabs-outer" style={{ padding: "0 2rem 0" }}>
+        <div className="mp-tabs-inner" style={{ display: "flex", gap: "0.6rem", justifyContent: "center", padding: "0.5rem 0" }}>
+          {fullMenuData.map((c, i) => {
+            const isActive = i === activeTab;
+            return (
+              <button key={i} className="mp-tab" onClick={() => switchTab(i)} style={{
+                padding: "0.6rem 1.2rem",
+                fontFamily: "'Cinzel', serif", fontSize: "0.6rem", letterSpacing: "0.18em",
+                color: isActive ? (lm ? "#1a0800" : "#0d0b07") : (lm ? "#3d1a00" : "rgba(212,175,89,0.7)"),
+                background: isActive
+                  ? "linear-gradient(135deg, #ffe066, #d4af59)"
+                  : (lm ? "rgba(40,15,0,0.15)" : "rgba(212,175,89,0.07)"),
+                border: isActive ? "1px solid #d4af59" : `1px solid ${t.border}`,
+                borderRadius: "2px",
+                boxShadow: isActive ? "0 4px 20px rgba(212,175,89,0.35)" : "none",
+                fontWeight: isActive ? 700 : 400,
+                whiteSpace: "nowrap",
+              }}>
+                {c.icon} {c.category}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Divider */}
+      <div style={{ width: "100%", height: "1px", background: `linear-gradient(90deg,transparent,${t.border},transparent)`, margin: "1rem 0" }} />
+
+      {/* Items */}
+      <div className="mp-items-wrap" style={{
+        maxWidth: "1100px", margin: "0 auto", padding: "1.5rem 2rem 5rem",
+        opacity: entering ? 0 : 1, transform: entering ? "translateY(12px)" : "translateY(0)",
+        transition: "opacity 0.22s ease, transform 0.22s ease",
+      }}>
+        {/* Category header */}
+        <div className="mp-cat-header" style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "2.5rem" }}>
+          <span style={{ fontSize: "2.5rem" }}>{cat.icon}</span>
+          <div>
+            <h2 style={{ fontFamily: "'Cinzel', serif", fontSize: "1.6rem", color: t.sectionHeadingColor, margin: 0, letterSpacing: "0.1em" }}>{cat.category}</h2>
+            <div style={{ fontSize: "0.65rem", color: t.textFaint, fontFamily: "'Cormorant Garamond', serif", fontStyle: "italic", marginTop: "0.2rem" }}>{cat.items.length} pozycji</div>
+          </div>
+        </div>
+
+        {/* Cards */}
+        <div className="mp-cards-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "1.2rem" }}>
+          {cat.items.map((item, idx) => (
+            <div key={idx} className="mp-item" style={{
+              background: lm ? "rgba(40,15,0,0.14)" : "rgba(255,255,255,0.04)",
+              border: lm ? "1px solid rgba(60,20,0,0.35)" : "1px solid rgba(212,175,89,0.18)",
+              borderRadius: "4px", overflow: "hidden",
+              display: "flex", flexDirection: "column",
+              animation: `itemsIn 0.4s ease ${idx * 0.07}s both`,
+            }}>
+              <div className="mp-card-emoji" style={{
+                background: lm ? "rgba(40,15,0,0.2)" : "rgba(212,175,89,0.06)",
+                borderBottom: lm ? "1px solid rgba(60,20,0,0.2)" : "1px solid rgba(212,175,89,0.1)",
+                padding: "1.8rem", textAlign: "center", fontSize: "3.5rem",
+                lineHeight: 1, position: "relative",
+              }}>
+                <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "2px", background: "linear-gradient(90deg,transparent,#d4af59,transparent)" }} />
+                {item.emoji}
+              </div>
+              <div style={{ padding: "1.2rem 1.4rem", flex: 1, display: "flex", flexDirection: "column" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.5rem" }}>
+                  <h3 style={{ fontFamily: "'Cinzel', serif", fontSize: "0.9rem", color: t.sectionHeadingColor, margin: 0, letterSpacing: "0.06em", lineHeight: 1.3 }}>
+                    {item.name}
+                  </h3>
+                  <span style={{ fontFamily: "'Cinzel', serif", fontSize: "1rem", color: lm ? "#6b3200" : "#d4af59", fontWeight: 700, flexShrink: 0, marginLeft: "0.8rem" }}>
+                    {item.price}
+                  </span>
+                </div>
+                <p style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "0.9rem", color: lm ? "#2a1200" : "rgba(245,230,200,0.6)", lineHeight: 1.6, margin: 0, flex: 1 }}>
+                  {item.desc}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const ExpandCard = ({ item, index, lightMode, t }) => {
   const [expanded, setExpanded] = useState(false);
   const [ref, visible] = useIntersection();
   const lm = lightMode;
@@ -50,10 +685,15 @@ const MenuCard = ({ item, index, lightMode }) => {
       transition: `all 0.7s cubic-bezier(0.16,1,0.3,1) ${index * 0.15}s`,
       background: lm ? "rgba(40,15,0,0.15)" : "rgba(255,255,255,0.04)",
       border: lm ? "1px solid rgba(60,20,0,0.4)" : "1px solid rgba(212,175,89,0.25)",
-      borderRadius: "2px", padding: "2.5rem", cursor: "pointer", position: "relative", overflow: "hidden",
+      borderRadius: "2px", padding: "2.5rem", cursor: "pointer",
+      position: "relative", overflow: "hidden",
+      boxShadow: expanded ? (lm ? "0 8px 40px rgba(40,15,0,0.2)" : "0 8px 40px rgba(0,0,0,0.4)") : "none",
+      transition: `opacity 0.7s cubic-bezier(0.16,1,0.3,1) ${index * 0.15}s, transform 0.7s cubic-bezier(0.16,1,0.3,1) ${index * 0.15}s, box-shadow 0.3s ease`,
     }}>
+      {/* Gold left bar */}
       <div style={{ position: "absolute", top: 0, left: 0, width: "3px", height: "100%", background: "linear-gradient(180deg, #d4af59, #8b6914)" }} />
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1rem" }}>
+      {/* Header row */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.5rem" }}>
         <div>
           <div style={{ fontSize: "0.65rem", letterSpacing: "0.25em", color: lm ? "#6b3200" : "#d4af59", marginBottom: "0.4rem", fontFamily: "'Cinzel', serif" }}>
             {item.emoji} {item.subtitle}
@@ -62,21 +702,23 @@ const MenuCard = ({ item, index, lightMode }) => {
             {item.category}
           </h3>
         </div>
-        <div style={{ fontFamily: "'Cinzel', serif", fontSize: "1.6rem", color: lm ? "#6b3200" : "#d4af59", fontWeight: "700", letterSpacing: "0.03em" }}>
+        <div style={{ fontFamily: "'Cinzel', serif", fontSize: "1.6rem", color: lm ? "#6b3200" : "#d4af59", fontWeight: "700" }}>
           {item.price}
         </div>
       </div>
-      <div style={{ maxHeight: expanded ? "500px" : "0", overflow: "hidden", transition: "max-height 0.5s cubic-bezier(0.16,1,0.3,1)" }}>
-        <div style={{ borderTop: lm ? "1px solid rgba(60,20,0,0.25)" : "1px solid rgba(212,175,89,0.15)", paddingTop: "1.2rem", marginTop: "0.5rem" }}>
+      {/* Expandable content */}
+      <div style={{ maxHeight: expanded ? "600px" : "0", overflow: "hidden", transition: "max-height 0.55s cubic-bezier(0.16,1,0.3,1)" }}>
+        <div style={{ borderTop: lm ? "1px solid rgba(60,20,0,0.2)" : "1px solid rgba(212,175,89,0.15)", paddingTop: "1.2rem", marginTop: "1rem" }}>
           {item.items.map((it, idx) => (
             <div key={idx} style={{ display: "flex", alignItems: "center", gap: "0.8rem", padding: "0.35rem 0", color: lm ? "#2a1000" : "rgba(245,230,200,0.75)", fontFamily: "'Cormorant Garamond', serif", fontSize: "1rem", letterSpacing: "0.03em" }}>
-              <span style={{ color: lm ? "#8b4200" : "#d4af59", fontSize: "0.5rem" }}>◆</span>
+              <span style={{ color: lm ? "#8b4200" : "#d4af59", fontSize: "0.5rem", flexShrink: 0 }}>◆</span>
               {it}
             </div>
           ))}
         </div>
       </div>
-      <div style={{ marginTop: "1rem", fontSize: "0.7rem", letterSpacing: "0.15em", color: lm ? "rgba(100,40,0,0.6)" : "rgba(212,175,89,0.5)", textAlign: "right", fontFamily: "'Cinzel', serif" }}>
+      {/* Toggle hint */}
+      <div style={{ marginTop: "0.8rem", fontSize: "0.7rem", letterSpacing: "0.15em", color: lm ? "rgba(100,40,0,0.5)" : "rgba(212,175,89,0.45)", textAlign: "right", fontFamily: "'Cinzel', serif" }}>
         {expanded ? "ZWIŃ ▲" : "ROZWIŃ ▼"}
       </div>
     </div>
@@ -169,6 +811,7 @@ export default function SushiSzczygiel() {
   const [loaderDone, setLoaderDone] = useState(false);
   const [lightMode, setLightMode] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [menuPageOpen, setMenuPageOpen] = useState(false);
 
   useEffect(() => { if (loaderDone) setTimeout(() => setHeroVisible(true), 200); }, [loaderDone]);
 
@@ -258,6 +901,9 @@ export default function SushiSzczygiel() {
     <>
     {!loaderDone && <SushiLoader onComplete={() => setLoaderDone(true)} />}
 
+    {/* Full-screen Menu Page */}
+    {menuPageOpen && <MenuPage lightMode={lightMode} t={t} onBack={() => setMenuPageOpen(false)} />}
+
     {/* SOCIAL BUBBLES — positioned left of back-to-top so they don't overlap */}
     {loaderDone && (
       <div style={{ position: "fixed", bottom: "2rem", right: "2rem", display: "flex", flexDirection: "column", gap: "0.8rem", zIndex: 300 }}>
@@ -312,6 +958,7 @@ export default function SushiSzczygiel() {
           .form-row-3 { grid-template-columns: 1fr !important; }
           .talerz-grid { grid-template-columns: 1fr !important; }
           .form-inner { padding: 1.5rem !important; }
+          .menu-preview-grid { grid-template-columns: repeat(2, 1fr) !important; }
           .section-pad { padding: 4rem 1.5rem !important; }
           .nav-pad { padding: 1rem 1.5rem !important; }
           .talerz-item { flex-direction: row !important; align-items: center !important; text-align: left !important; gap: 0.8rem !important; }
@@ -335,9 +982,10 @@ export default function SushiSzczygiel() {
 
           {/* Desktop links */}
           <div className="nav-desktop-links" style={{ gap: "2.5rem", alignItems: "center" }}>
-            {[["about","O NAS"],["menu","MENU"],["order","ZAMÓW"],["kontakt","KONTAKT"]].map(([id, label]) => (
+            {[["about","O NAS"],["order","ZAMÓW"],["kontakt","KONTAKT"]].map(([id, label]) => (
               <span key={id} className="nav-link" onClick={() => scrollTo(id)}>{label}</span>
             ))}
+            <span className="nav-link" onClick={() => setMenuPageOpen(true)}>MENU</span>
             {/* Theme toggle */}
             <div onClick={() => setLightMode(l => !l)} title={lightMode ? "Tryb ciemny" : "Tryb jasny"}
               style={{ width: "38px", height: "22px", borderRadius: "11px", background: lightMode ? "linear-gradient(90deg,#d4af59,#ffe066)" : "rgba(212,175,89,0.15)", border: `1px solid ${lightMode ? "#d4af59" : "rgba(212,175,89,0.5)"}`, position: "relative", cursor: "pointer", transition: "background 0.4s", flexShrink: 0 }}>
@@ -358,13 +1006,18 @@ export default function SushiSzczygiel() {
         {/* Mobile dropdown */}
         {mobileMenuOpen && (
           <div className="mobile-menu-dropdown" style={{ background: t.bgNav, borderTop: `1px solid ${t.border}`, animation: "mobileMenuIn 0.25s ease" }}>
-            {[["about","O NAS"],["menu","MENU"],["order","ZAMÓW"],["kontakt","KONTAKT"]].map(([id, label]) => (
+            {[["about","O NAS"],["order","ZAMÓW"],["kontakt","KONTAKT"]].map(([id, label]) => (
               <div key={id} onClick={() => scrollTo(id)}
                 style={{ padding: "0.9rem 2rem", fontFamily: "'Cinzel', serif", fontSize: "0.72rem", letterSpacing: "0.2em", color: t.navLinkColor, cursor: "pointer", borderBottom: `1px solid ${t.border}`, transition: "background 0.2s" }}
                 onMouseEnter={e => e.currentTarget.style.background = "rgba(212,175,89,0.08)"}
                 onMouseLeave={e => e.currentTarget.style.background = "transparent"}
               >{label}</div>
             ))}
+            <div onClick={() => { setMobileMenuOpen(false); setMenuPageOpen(true); }}
+              style={{ padding: "0.9rem 2rem", fontFamily: "'Cinzel', serif", fontSize: "0.72rem", letterSpacing: "0.2em", color: t.navLinkColor, cursor: "pointer", borderBottom: `1px solid ${t.border}`, transition: "background 0.2s" }}
+              onMouseEnter={e => e.currentTarget.style.background = "rgba(212,175,89,0.08)"}
+              onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+            >MENU</div>
             <div style={{ padding: "0.9rem 2rem", display: "flex", alignItems: "center", gap: "1rem" }}>
               <span style={{ fontFamily: "'Cinzel', serif", fontSize: "0.6rem", letterSpacing: "0.15em", color: t.navLinkColor }}>{lightMode ? "TRYB CIEMNY" : "TRYB JASNY"}</span>
               <div onClick={() => setLightMode(l => !l)} style={{ width: "36px", height: "20px", borderRadius: "10px", background: lightMode ? "linear-gradient(90deg,#d4af59,#ffe066)" : "rgba(212,175,89,0.15)", border: "1px solid rgba(212,175,89,0.5)", position: "relative", cursor: "pointer", transition: "background 0.4s" }}>
@@ -433,23 +1086,57 @@ export default function SushiSzczygiel() {
 
       {/* MENU */}
       <section id="menu" className="section-pad" style={{ padding: "6rem 4rem", position: "relative" }}>
-        <div style={{ maxWidth: "900px", margin: "0 auto" }}>
+        <FloatingOrb style={{ width: "500px", height: "500px", top: "0", left: "50%", transform: "translateX(-50%)" }} />
+        <div style={{ maxWidth: "700px", margin: "0 auto", position: "relative", zIndex: 1 }}>
           <FadeIn>
-            <div style={{ textAlign: "center", marginBottom: "5rem" }}>
+            <div style={{ textAlign: "center", marginBottom: "4rem" }}>
               <div style={{ fontSize: "0.65rem", letterSpacing: "0.3em", color: t.sectionSubColor, marginBottom: "1rem", fontFamily: "'Cinzel', serif" }}>✦ NASZE PROPOZYCJE</div>
               <h2 style={{ fontFamily: "'Cinzel', serif", fontSize: "clamp(2.5rem, 5vw, 4rem)", color: t.sectionHeadingColor }}>Menu</h2>
               <div style={{ width: "60px", height: "1px", background: `linear-gradient(90deg, transparent, ${t.gold}, transparent)`, margin: "1.5rem auto 0" }} />
             </div>
           </FadeIn>
-          <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-            {menuData.map((item, i) => (
-              <MenuCard key={i} item={item} index={i} lightMode={lightMode} />
-            ))}
-          </div>
-          <FadeIn delay={0.3}>
-            <p style={{ textAlign: "center", marginTop: "3rem", fontSize: "0.85rem", color: t.textFaint, fontStyle: "italic", letterSpacing: "0.05em" }}>
-              * Kliknij na talerz, aby zobaczyć skład. Wszystkie ceny brutto.
-            </p>
+
+          <FadeIn delay={0.15}>
+            {/* Preview tiles */}
+            <div className="menu-preview-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1rem", marginBottom: "3rem" }}>
+              {fullMenuData.slice(0, 6).map((cat, i) => (
+                <div key={i} onClick={() => setMenuPageOpen(true)} style={{
+                  border: `1px solid ${t.border}`,
+                  background: t.cardBg,
+                  borderRadius: "4px", padding: "1.5rem 1rem",
+                  textAlign: "center", cursor: "pointer",
+                  transition: "all 0.25s",
+                }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = "#d4af59"; e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 8px 30px rgba(0,0,0,0.35)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = t.border; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+                >
+                  <div style={{ fontSize: "2rem", marginBottom: "0.6rem" }}>{cat.icon}</div>
+                  <div style={{ fontFamily: "'Cinzel', serif", fontSize: "0.55rem", letterSpacing: "0.15em", color: lightMode ? "#3d1a00" : "rgba(212,175,89,0.8)" }}>{cat.category}</div>
+                  <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "0.8rem", color: t.textFaint, marginTop: "0.3rem" }}>{cat.items.length} pozycji</div>
+                </div>
+              ))}
+            </div>
+
+            {/* CTA button */}
+            <div style={{ textAlign: "center" }}>
+              <button onClick={() => setMenuPageOpen(true)} style={{
+                background: "linear-gradient(135deg, #d4af59, #8b6914)",
+                border: "none", color: "#0d0b07",
+                fontFamily: "'Cinzel', serif", fontSize: "0.75rem",
+                letterSpacing: "0.25em", fontWeight: 700,
+                padding: "1.1rem 3rem", cursor: "pointer",
+                transition: "all 0.3s", borderRadius: "2px",
+                boxShadow: "0 4px 20px rgba(212,175,89,0.25)",
+              }}
+                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 10px 35px rgba(212,175,89,0.45)"; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 4px 20px rgba(212,175,89,0.25)"; }}
+              >
+                PEŁNA KARTA DAŃ →
+              </button>
+              <p style={{ marginTop: "1.2rem", fontSize: "0.8rem", color: t.textFaint, fontFamily: "'Cormorant Garamond', serif", fontStyle: "italic" }}>
+                Zestawy · Rolki · Przekąski · Desery · Napoje · Drinki
+              </p>
+            </div>
           </FadeIn>
         </div>
       </section>
